@@ -1,7 +1,7 @@
 import openai
 import telegram
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
-from secret import *
+from config import *
 
 # Get the required data from secret
 openai.api_key = aikey
