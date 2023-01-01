@@ -23,6 +23,21 @@ def chatbot_response(message):
   # Return the response text
   return response.text
 
+def echo(update, context):
+    user_input = update.message.text
+    response = chatgpt_response(user_input)
+    if not response:
+        response = "I'm sorry, I am unable to generate a response based on your input."
+
+    while response:
+        if len(response) > 4096:
+            chunk = response[:4096]
+            response = response[4096:]
+        else:
+            chunk = response
+            response = ""
+        update.message.reply_text(chunk)
+
 # Define a function to handle incoming messages
 def handle_message(update, context):
   # Get the incoming message
@@ -34,11 +49,12 @@ def handle_message(update, context):
   # Send the response to the user
   context.bot.send_message(chat_id=update.effective_chat.id, text=response)
 
-# Set up the updater
-updater = Updater(token=telegramtoken, use_context=True)
+def main():
+    updater = Updater(telegramtoken, use_context=True)
+    dp = updater.dispatcher
+    dp.add_handler(MessageHandler(Filters.text, echo))
+    updater.start_polling()
+    updater.idle()
 
-# Add a message handler
-updater.dispatcher.add_handler(MessageHandler(Filters.text, handle_message))
-
-# Start the bot
-updater.start_polling()
+if __name__ == '__main__':
+    main()
